@@ -215,12 +215,10 @@ Triggered after the eligibility filter returns < N matches (default `N = 8`). So
 
 ### LLM scoring + narrative (streamed)
 
-Single chained run with:
+Two sequential LLM calls inside the same server action, both streamed to the client:
 
-- Org + project (compact JSON)
-- Top ~20 surviving programs from eligibility filter, with their flags
-- Tool `score(program_id, score, reasoning)` — repeated calls, one per program (Sonnet 4.6)
-- Tool `narrative(markdown)` — final call, drafts strategy document (Opus 4.7)
+1. **Scoring call (Sonnet 4.6)** — input: org + project (compact JSON) + top ~20 surviving programs from the eligibility filter with their flags. Tool `score(program_id, score, reasoning)` is invoked repeatedly, one call per program. Results buffered in memory.
+2. **Narrative call (Opus 4.7)** — input: org + project + the scored programs from step 1 (top N=8 by score). Tool `narrative(markdown)` produces the final strategy document.
 
 The narrative the model is instructed to produce:
 
@@ -292,8 +290,8 @@ sections:
    1. Append `{role:user, content}` to `interview_sessions.messages`.
    2. Stream LLM (Sonnet 4.6) with system prompt: "You are interviewing for funding eligibility data. Current scripted question: {q}. If the user's answer is unclear or incomplete, ask ONE follow-up. Otherwise acknowledge and move on."
    3. Stream reply tokens to client; append to messages on completion.
-4. Client decides: follow-up vs move-on, detected via tool calls `emit_followup()` vs `emit_acknowledge()`.
-5. Acknowledge → request next scripted question. Followup → stay on this question.
+4. The LLM signals intent via tool calls: `emit_followup()` keeps the conversation on the current question; `emit_acknowledge()` releases it. The client observes which tool was called.
+5. On `emit_acknowledge`: client requests the next scripted question. On `emit_followup`: client stays on the current question and waits for the user's next reply.
 6. Every 4 turns and on session end, the extraction LLM runs in the background.
 
 ### Extraction (separate LLM call)
