@@ -1,10 +1,13 @@
 import { z } from "zod";
 
 const emptyToUndefined = (v: unknown) => (v === "" ? undefined : v);
-const moneyString = z
-  .string()
-  .regex(/^\d+(\.\d{1,2})?$/, "Must be a decimal with up to 2 fractional digits")
-  .optional();
+const moneyString = z.preprocess(
+  emptyToUndefined,
+  z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/, "Must be a decimal with up to 2 fractional digits")
+    .optional()
+);
 
 export const consortiumPartnerSchema = z.object({
   name: z.string().min(1),
@@ -54,7 +57,7 @@ export const projectInsertSchema = z
     timeline_end: z.preprocess(emptyToUndefined, z.coerce.date().optional()),
     duration_months: z.coerce.number().int().min(1).optional(),
     consortium_partners: z.array(consortiumPartnerSchema).default([]),
-    equity_willingness: equityWillingnessEnum.optional(),
+    equity_willingness: z.preprocess(emptyToUndefined, equityWillingnessEnum.optional()),
     narrative: z.preprocess(emptyToUndefined, z.string().optional()),
   })
   .strict()

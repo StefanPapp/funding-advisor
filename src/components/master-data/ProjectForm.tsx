@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition } from "react";
+import { useId, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { z } from "zod";
 import {
@@ -58,83 +58,106 @@ export function ProjectForm({ orgs, initial, action, submitLabel = "Save" }: Pro
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-xl">
       <Field label="Organization" error={errors.organization_id?.message}>
-        <select className="border rounded px-2 py-1 w-full" {...register("organization_id")}>
-          {orgs.map((o) => (
-            <option key={o.id} value={o.id}>
-              {o.legal_name}
-            </option>
-          ))}
-        </select>
+        {(id) => (
+          <select
+            id={id}
+            className="border rounded px-2 py-1 w-full"
+            {...register("organization_id")}
+          >
+            {orgs.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.legal_name}
+              </option>
+            ))}
+          </select>
+        )}
       </Field>
       <Field label="Title" error={errors.title?.message}>
-        <Input {...register("title")} />
+        {(id) => <Input id={id} {...register("title")} />}
       </Field>
       <Field label="Summary" error={errors.summary?.message}>
-        <Textarea {...register("summary")} rows={3} />
+        {(id) => <Textarea id={id} {...register("summary")} rows={3} />}
       </Field>
       <Field label="Status" error={errors.status?.message}>
-        <select className="border rounded px-2 py-1 w-full" {...register("status")}>
-          {projectStatusEnum.options.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        {(id) => (
+          <select id={id} className="border rounded px-2 py-1 w-full" {...register("status")}>
+            {projectStatusEnum.options.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        )}
       </Field>
       <Field label="TRL (1–9)" error={errors.trl?.message}>
-        <Input
-          type="number"
-          min={1}
-          max={9}
-          {...register("trl", {
-            setValueAs: (v) => (v === "" || v == null ? undefined : Number(v)),
-          })}
-        />
+        {(id) => (
+          <Input
+            id={id}
+            type="number"
+            min={1}
+            max={9}
+            {...register("trl", {
+              setValueAs: (v) => (v === "" || v == null ? undefined : Number(v)),
+            })}
+          />
+        )}
       </Field>
       <Field label="Domains (comma-separated)" error={errors.domain?.message}>
-        <Input
-          {...register("domain", {
-            setValueAs: (v) =>
-              typeof v === "string" ? v.split(",").map((s) => s.trim()).filter(Boolean) : v,
-          })}
-        />
+        {(id) => (
+          <Input
+            id={id}
+            {...register("domain", {
+              setValueAs: (v) =>
+                typeof v === "string" ? v.split(",").map((s) => s.trim()).filter(Boolean) : v,
+            })}
+          />
+        )}
       </Field>
       <Field label="Total budget (EUR)" error={errors.total_budget?.message}>
-        <Input {...register("total_budget")} placeholder="0.00" />
+        {(id) => <Input id={id} {...register("total_budget")} placeholder="0.00" />}
       </Field>
       <Field label="Funding gap (EUR)" error={errors.funding_gap?.message}>
-        <Input {...register("funding_gap")} placeholder="0.00" />
+        {(id) => <Input id={id} {...register("funding_gap")} placeholder="0.00" />}
       </Field>
       <Field label="Currency (ISO-3)" error={errors.currency?.message}>
-        <Input {...register("currency")} maxLength={3} />
+        {(id) => <Input id={id} {...register("currency")} maxLength={3} />}
       </Field>
       <Field label="Timeline start" error={errors.timeline_start?.message}>
-        <Input type="date" {...register("timeline_start")} />
+        {(id) => <Input id={id} type="date" {...register("timeline_start")} />}
       </Field>
       <Field label="Timeline end" error={errors.timeline_end?.message}>
-        <Input type="date" {...register("timeline_end")} />
+        {(id) => <Input id={id} type="date" {...register("timeline_end")} />}
       </Field>
       <Field label="Duration (months)" error={errors.duration_months?.message}>
-        <Input
-          type="number"
-          min={1}
-          {...register("duration_months", {
-            setValueAs: (v) => (v === "" || v == null ? undefined : Number(v)),
-          })}
-        />
+        {(id) => (
+          <Input
+            id={id}
+            type="number"
+            min={1}
+            {...register("duration_months", {
+              setValueAs: (v) => (v === "" || v == null ? undefined : Number(v)),
+            })}
+          />
+        )}
       </Field>
       <Field label="Equity willingness" error={errors.equity_willingness?.message}>
-        <select className="border rounded px-2 py-1 w-full" {...register("equity_willingness")}>
-          <option value="">—</option>
-          {equityWillingnessEnum.options.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        {(id) => (
+          <select
+            id={id}
+            className="border rounded px-2 py-1 w-full"
+            {...register("equity_willingness")}
+          >
+            <option value="">—</option>
+            {equityWillingnessEnum.options.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        )}
       </Field>
       <Field label="Narrative" error={errors.narrative?.message}>
-        <Textarea {...register("narrative")} rows={4} />
+        {(id) => <Textarea id={id} {...register("narrative")} rows={4} />}
       </Field>
       <Button type="submit" disabled={pending}>
         {pending ? "Saving…" : submitLabel}
@@ -150,12 +173,13 @@ function Field({
 }: {
   label: string;
   error?: string;
-  children: React.ReactNode;
+  children: (id: string) => React.ReactNode;
 }) {
+  const id = useId();
   return (
     <div className="space-y-1">
-      <Label>{label}</Label>
-      {children}
+      <Label htmlFor={id}>{label}</Label>
+      {children(id)}
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );

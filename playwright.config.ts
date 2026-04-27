@@ -6,6 +6,7 @@ export default defineConfig({
   retries: 0,
   workers: 1,
   reporter: "list",
+  globalSetup: "./tests/e2e/global-setup.ts",
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",

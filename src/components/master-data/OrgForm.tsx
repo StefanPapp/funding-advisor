@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition } from "react";
+import { useId, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { z } from "zod";
 import { orgInsertSchema, type OrgInsert } from "@/domain/schemas";
@@ -47,47 +47,53 @@ export function OrgForm({ initial, action, submitLabel = "Save" }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-xl">
       <Field label="Legal name" error={errors.legal_name?.message}>
-        <Input {...register("legal_name")} />
+        {(id) => <Input id={id} {...register("legal_name")} />}
       </Field>
       <Field label="Trading name" error={errors.trading_name?.message}>
-        <Input {...register("trading_name")} />
+        {(id) => <Input id={id} {...register("trading_name")} />}
       </Field>
       <Field label="Country (ISO-2)" error={errors.country?.message}>
-        <Input {...register("country")} maxLength={2} />
+        {(id) => <Input id={id} {...register("country")} maxLength={2} />}
       </Field>
       <Field label="Region (NUTS-2)" error={errors.region?.message}>
-        <Input {...register("region")} />
+        {(id) => <Input id={id} {...register("region")} />}
       </Field>
       <Field label="Legal form" error={errors.legal_form?.message}>
-        <Input {...register("legal_form")} placeholder="GmbH, AG, …" />
+        {(id) => <Input id={id} {...register("legal_form")} placeholder="GmbH, AG, …" />}
       </Field>
       <Field label="Employees" error={errors.employee_count?.message}>
-        <Input
-          type="number"
-          min={0}
-          {...register("employee_count", {
-            setValueAs: (v) => (v === "" || v == null ? undefined : Number(v)),
-          })}
-        />
+        {(id) => (
+          <Input
+            id={id}
+            type="number"
+            min={0}
+            {...register("employee_count", {
+              setValueAs: (v) => (v === "" || v == null ? undefined : Number(v)),
+            })}
+          />
+        )}
       </Field>
       <Field label="Annual revenue (EUR)" error={errors.annual_revenue?.message}>
-        <Input {...register("annual_revenue")} placeholder="0.00" />
+        {(id) => <Input id={id} {...register("annual_revenue")} placeholder="0.00" />}
       </Field>
       <Field label="Balance sheet total (EUR)" error={errors.balance_sheet_total?.message}>
-        <Input {...register("balance_sheet_total")} placeholder="0.00" />
+        {(id) => <Input id={id} {...register("balance_sheet_total")} placeholder="0.00" />}
       </Field>
       <Field label="Sectors (comma-separated NACE codes)" error={errors.sectors?.message}>
-        <Input
-          {...register("sectors", {
-            setValueAs: (v) =>
-              typeof v === "string"
-                ? v.split(",").map((s) => s.trim()).filter(Boolean)
-                : v,
-          })}
-        />
+        {(id) => (
+          <Input
+            id={id}
+            {...register("sectors", {
+              setValueAs: (v) =>
+                typeof v === "string"
+                  ? v.split(",").map((s) => s.trim()).filter(Boolean)
+                  : v,
+            })}
+          />
+        )}
       </Field>
       <Field label="Narrative" error={errors.narrative?.message}>
-        <Textarea {...register("narrative")} rows={4} />
+        {(id) => <Textarea id={id} {...register("narrative")} rows={4} />}
       </Field>
       <Button type="submit" disabled={pending}>
         {pending ? "Saving…" : submitLabel}
@@ -103,12 +109,13 @@ function Field({
 }: {
   label: string;
   error?: string;
-  children: React.ReactNode;
+  children: (id: string) => React.ReactNode;
 }) {
+  const id = useId();
   return (
     <div className="space-y-1">
-      <Label>{label}</Label>
-      {children}
+      <Label htmlFor={id}>{label}</Label>
+      {children(id)}
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );
