@@ -8,7 +8,7 @@ export default defineConfig({
     globals: true,
     pool: "forks",
     maxWorkers: 1,
-    isolate: false,
+    isolate: true,
     hookTimeout: 30_000,
   },
   resolve: {
