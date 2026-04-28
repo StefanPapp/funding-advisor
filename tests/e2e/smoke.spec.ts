@@ -54,4 +54,13 @@ test("home → create org → create project → see them", async ({ page }) => 
   await expect(page.getByRole("heading", { name: /Strategy — /i })).toBeVisible();
   // No report yet; the empty-state message should appear
   await expect(page.getByText(/No strategy generated yet/i)).toBeVisible();
+
+  // Interview page: navigate from project detail
+  // Note: project detail now has 3 buttons — go back to projects list and into the project first
+  await page.getByRole("link", { name: "Projects" }).click();
+  await page.getByRole("link", { name: PROJECT }).click();
+  await page.getByRole("link", { name: "Deep-dive interview", exact: true }).click();
+  await expect(page.getByRole("heading", { name: /Deep-dive interview/i })).toBeVisible();
+  // First scripted question should appear (we created a project; project script's first required question is "Summarize the project in 1-2 sentences.")
+  await expect(page.getByText(/Current question:/i)).toBeVisible();
 });
