@@ -126,7 +126,11 @@ export async function generateStrategy(params: {
     for (const c of research.candidates) {
       await db
         .insert(funding_programs)
-        .values({ ...c, last_verified_at: new Date() })
+        .values({
+          ...c,
+          application_deadline: c.application_deadline?.toISOString().slice(0, 10),
+          last_verified_at: new Date(),
+        })
         .onConflictDoNothing({
           target: [funding_programs.provider, funding_programs.program_name],
         });

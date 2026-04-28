@@ -2,7 +2,7 @@ import { generateText, type LanguageModel } from "ai";
 import { z } from "zod";
 import {
   fundingProgramInsertSchema,
-  type FundingProgramInput,
+  type FundingProgramInsert,
 } from "@/domain/programs";
 
 const researchOutputSchema = z.object({
@@ -26,7 +26,7 @@ export type ResearchInput = {
 };
 
 export type ResearchResult = {
-  candidates: FundingProgramInput[];
+  candidates: FundingProgramInsert[];
   error?: string;
   promptTokens?: number;
   completionTokens?: number;
@@ -83,7 +83,7 @@ Already in the candidate set: ${currentCount} programs`;
     };
   }
 
-  const candidates: FundingProgramInput[] = [];
+  const candidates: FundingProgramInsert[] = [];
   for (const raw of parsed.programs) {
     const r = fundingProgramInsertSchema.safeParse(raw);
     if (r.success) candidates.push(r.data);
