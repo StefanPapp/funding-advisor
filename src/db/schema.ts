@@ -11,6 +11,7 @@ import {
   check,
   index,
   uniqueIndex,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -166,6 +167,22 @@ export const eligibility_results = pgTable("eligibility_results", {
   reportIdx: index("eligibility_results_report_id_idx").on(t.report_id),
 }));
 
+export const interviewSubjectEnum = pgEnum("interview_subject_type", ["org", "project"]);
+
+export const interview_sessions = pgTable("interview_sessions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  subject_type: interviewSubjectEnum("subject_type").notNull(),
+  subject_id: uuid("subject_id").notNull(),
+  current_question_id: text("current_question_id"),
+  messages: jsonb("messages").notNull().default(sql`'[]'::jsonb`),
+  extracted_fields: jsonb("extracted_fields").notNull().default(sql`'{}'::jsonb`),
+  is_complete: boolean("is_complete").notNull().default(false),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+  subjectIdx: index("interview_sessions_subject_idx").on(t.subject_type, t.subject_id),
+}));
+
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
 export type Project = typeof projects.$inferSelect;
@@ -176,3 +193,5 @@ export type StrategyReport = typeof strategy_reports.$inferSelect;
 export type NewStrategyReport = typeof strategy_reports.$inferInsert;
 export type EligibilityResultRow = typeof eligibility_results.$inferSelect;
 export type NewEligibilityResultRow = typeof eligibility_results.$inferInsert;
+export type InterviewSession = typeof interview_sessions.$inferSelect;
+export type NewInterviewSession = typeof interview_sessions.$inferInsert;
