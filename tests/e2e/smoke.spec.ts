@@ -48,4 +48,10 @@ test("home → create org → create project → see them", async ({ page }) => 
   await page.getByRole("link", { name: "Projects" }).click();
   await page.getByRole("link", { name: PROJECT }).click();
   await expect(page.getByRole("heading", { name: /Quick match/i })).toBeVisible();
+
+  // Strategy page: navigate from project detail
+  await page.getByRole("link", { name: "Strategy", exact: true }).click();
+  await expect(page.getByRole("heading", { name: /Strategy — /i })).toBeVisible();
+  // No report yet; the empty-state message should appear
+  await expect(page.getByText(/No strategy generated yet/i)).toBeVisible();
 });
