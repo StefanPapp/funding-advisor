@@ -10,6 +10,7 @@ import {
   pgEnum,
   check,
   index,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -90,7 +91,52 @@ export const projects = pgTable(
   })
 );
 
+export const programKindEnum = pgEnum("program_kind", [
+  "grant",
+  "equity",
+  "debt",
+  "alternative",
+]);
+
+export const programSourceEnum = pgEnum("program_source", ["seed", "llm_research"]);
+export const programConfidenceEnum = pgEnum("program_confidence", ["high", "medium", "low"]);
+
+export const funding_programs = pgTable(
+  "funding_programs",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: programKindEnum("kind").notNull(),
+    provider: text("provider").notNull(),
+    program_name: text("program_name").notNull(),
+    url: text("url"),
+    geography_scope: jsonb("geography_scope").notNull(),
+    sectors: text("sectors").array().notNull().default(sql`'{}'::text[]`),
+    domains: text("domains").array().notNull().default(sql`'{}'::text[]`),
+    min_amount: numeric("min_amount", { precision: 14, scale: 2 }),
+    max_amount: numeric("max_amount", { precision: 14, scale: 2 }),
+    typical_amount: numeric("typical_amount", { precision: 14, scale: 2 }),
+    currency: text("currency").notNull().default("EUR"),
+    eligibility_rules: jsonb("eligibility_rules").notNull(),
+    application_deadline: date("application_deadline"),
+    source: programSourceEnum("source").notNull(),
+    last_verified_at: timestamp("last_verified_at", { withTimezone: true }).notNull().defaultNow(),
+    confidence: programConfidenceEnum("confidence").notNull().default("medium"),
+    created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => ({
+    currencyCheck: check("funding_programs_currency_iso", sql`length(${t.currency}) = 3`),
+    providerNameUq: uniqueIndex("funding_programs_provider_program_name_uq").on(
+      t.provider,
+      t.program_name
+    ),
+    kindIdx: index("funding_programs_kind_idx").on(t.kind),
+  })
+);
+
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
+export type FundingProgram = typeof funding_programs.$inferSelect;
+export type NewFundingProgram = typeof funding_programs.$inferInsert;

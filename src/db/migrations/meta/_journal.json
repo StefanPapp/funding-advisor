@@ -8,6 +8,13 @@
       "when": 1777311528292,
       "tag": "0000_colossal_darkhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777347555924,
+      "tag": "0001_hot_oracle",
+      "breakpoints": true
     }
   ]
 }

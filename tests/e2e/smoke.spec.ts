@@ -32,4 +32,20 @@ test("home → create org → create project → see them", async ({ page }) => 
   // Verify in projects list
   await page.getByRole("link", { name: "Projects" }).click();
   await expect(page.getByRole("row", { name: new RegExp(PROJECT) })).toBeVisible();
+
+  // Catalog browse
+  await page.getByRole("link", { name: "Catalog" }).click();
+  await expect(page.getByRole("heading", { name: "Funding catalog" })).toBeVisible();
+  // Should list multiple seeded programs (15 total in seed)
+  const rows = page.locator("table tbody tr");
+  await expect(rows).toHaveCount(15);
+
+  // Filter by kind=equity
+  await page.getByRole("link", { name: "equity", exact: true }).click();
+  await expect(page.locator("table tbody tr")).toHaveCount(3);
+
+  // Quick match: navigate to project detail and assert the panel renders
+  await page.getByRole("link", { name: "Projects" }).click();
+  await page.getByRole("link", { name: PROJECT }).click();
+  await expect(page.getByRole("heading", { name: /Quick match/i })).toBeVisible();
 });
