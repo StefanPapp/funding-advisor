@@ -15,6 +15,13 @@
       "when": 1777347555924,
       "tag": "0001_hot_oracle",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777351009918,
+      "tag": "0002_spicy_colossus",
+      "breakpoints": true
     }
   ]
 }
