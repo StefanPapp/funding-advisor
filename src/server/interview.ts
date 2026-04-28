@@ -85,7 +85,10 @@ export async function sendTurn(
   });
 
   const resolved = models?.conversational ?? selectModel("scoring");
-  const model = "model" in resolved ? resolved.model : resolved;
+  const model =
+    typeof resolved === "object" && resolved !== null && "model" in resolved
+      ? resolved.model
+      : resolved;
 
   const reply = await converseTurn({ model, question: current, transcript: messages });
 
@@ -127,7 +130,10 @@ export async function applyExtraction(
   if (!s) throw new Error(`Session not found: ${sessionId}`);
 
   const resolved = models?.extraction ?? selectModel("scoring");
-  const model = "model" in resolved ? resolved.model : resolved;
+  const model =
+    typeof resolved === "object" && resolved !== null && "model" in resolved
+      ? resolved.model
+      : resolved;
 
   const r = await extractFields({
     model,
