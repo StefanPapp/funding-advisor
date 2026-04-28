@@ -47,7 +47,7 @@ export const fundingProgramInsertSchema = z
     kind: programKind,
     provider: z.string().min(1),
     program_name: z.string().min(1),
-    url: z.preprocess((v) => (v === "" ? undefined : v), z.string().url().optional()),
+    url: z.string().url().optional(),
     geography_scope: geographyScopeSchema,
     sectors: z.array(z.string().min(1)).default([]),
     domains: z.array(z.string().min(1)).default([]),
@@ -56,15 +56,13 @@ export const fundingProgramInsertSchema = z
     typical_amount: moneyString,
     currency: z.string().length(3).default("EUR"),
     eligibility_rules: eligibilityRulesSchema,
-    application_deadline: z.preprocess(
-      (v) => (v === "" || v == null ? undefined : v),
-      z.coerce.date().optional()
-    ),
+    application_deadline: z.coerce.date().optional(),
     source: programSource,
     confidence: programConfidence.optional(),
   })
   .strict();
 
 export type FundingProgramInsert = z.infer<typeof fundingProgramInsertSchema>;
+export type FundingProgramInput = z.input<typeof fundingProgramInsertSchema>;
 export type GeographyScope = z.infer<typeof geographyScopeSchema>;
 export type EligibilityRules = z.infer<typeof eligibilityRulesSchema>;

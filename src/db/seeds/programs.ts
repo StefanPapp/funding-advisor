@@ -1,6 +1,6 @@
-import type { FundingProgramInsert } from "@/domain/programs";
+import type { FundingProgramInput } from "@/domain/programs";
 
-export const seedPrograms: FundingProgramInsert[] = [
+export const seedPrograms: FundingProgramInput[] = [
   // ── Grants — EU-wide ───────────────────────────────────────────────
   {
     kind: "grant",
