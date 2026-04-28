@@ -134,9 +134,45 @@ export const funding_programs = pgTable(
   })
 );
 
+export const strategy_reports = pgTable("strategy_reports", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  project_id: uuid("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  generated_at: timestamp("generated_at", { withTimezone: true }).notNull().defaultNow(),
+  model_used: text("model_used").notNull(),
+  input_snapshot: jsonb("input_snapshot").notNull(),
+  narrative: text("narrative").notNull(),
+  summary: jsonb("summary").notNull(),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+  projectIdx: index("strategy_reports_project_id_idx").on(t.project_id),
+}));
+
+export const eligibility_results = pgTable("eligibility_results", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  report_id: uuid("report_id")
+    .notNull()
+    .references(() => strategy_reports.id, { onDelete: "cascade" }),
+  program_id: uuid("program_id")
+    .notNull()
+    .references(() => funding_programs.id, { onDelete: "restrict" }),
+  score: numeric("score", { precision: 5, scale: 2 }).notNull(),
+  flags: jsonb("flags").notNull(),
+  reasoning: text("reasoning"),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (t) => ({
+  scoreCheck: check("eligibility_results_score_range", sql`${t.score} >= 0 AND ${t.score} <= 100`),
+  reportIdx: index("eligibility_results_report_id_idx").on(t.report_id),
+}));
+
 export type Organization = typeof organizations.$inferSelect;
 export type NewOrganization = typeof organizations.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type FundingProgram = typeof funding_programs.$inferSelect;
 export type NewFundingProgram = typeof funding_programs.$inferInsert;
+export type StrategyReport = typeof strategy_reports.$inferSelect;
+export type NewStrategyReport = typeof strategy_reports.$inferInsert;
+export type EligibilityResultRow = typeof eligibility_results.$inferSelect;
+export type NewEligibilityResultRow = typeof eligibility_results.$inferInsert;
