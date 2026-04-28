@@ -3,6 +3,9 @@ import { createProject } from "@/server/projects";
 import { listOrgs } from "@/server/orgs";
 import type { ProjectInsert } from "@/domain/schemas";
 
+// Always read live orgs — otherwise the org dropdown is frozen to deploy-time state.
+export const dynamic = "force-dynamic";
+
 export default async function NewProjectPage() {
   const orgs = (await listOrgs()).map((o) => ({ id: o.id, legal_name: o.legal_name }));
 
