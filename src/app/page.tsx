@@ -1,6 +1,9 @@
 import { listOrgs } from "@/server/orgs";
 import { listProjects } from "@/server/projects";
 
+// Counts are read on every request — otherwise they freeze to deploy-time state.
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const [orgs, projects] = await Promise.all([listOrgs(), listProjects()]);
   return (
