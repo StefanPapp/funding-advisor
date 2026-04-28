@@ -26,11 +26,16 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ id: 
     <section className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{org.legal_name}</h1>
-        <form action={remove}>
-          <Button type="submit" variant="destructive">
-            Delete
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href={`/orgs/${id}/interview`}>Deep-dive interview</Link>
           </Button>
-        </form>
+          <form action={remove}>
+            <Button type="submit" variant="destructive">
+              Delete
+            </Button>
+          </form>
+        </div>
       </div>
 
       <OrgForm

@@ -34,6 +34,9 @@ export default async function ProjectDetailPage({
         <h1 className="text-2xl font-semibold">{project.title}</h1>
         <div className="flex gap-2">
           <Button asChild variant="outline">
+            <Link href={`/projects/${id}/interview`}>Deep-dive interview</Link>
+          </Button>
+          <Button asChild variant="outline">
             <Link href={`/projects/${id}/strategy`}>Strategy</Link>
           </Button>
           <form action={remove}>
