@@ -32,11 +32,16 @@ export default async function ProjectDetailPage({
     <section className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{project.title}</h1>
-        <form action={remove}>
-          <Button type="submit" variant="destructive">
-            Delete
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href={`/projects/${id}/strategy`}>Strategy</Link>
           </Button>
-        </form>
+          <form action={remove}>
+            <Button type="submit" variant="destructive">
+              Delete
+            </Button>
+          </form>
+        </div>
       </div>
       {parent && (
         <p className="text-sm text-muted-foreground">
